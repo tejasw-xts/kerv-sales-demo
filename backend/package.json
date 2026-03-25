@@ -1,0 +1,12 @@
+{
+  "name": "kerv-sales-demo-backend",
+  "version": "1.0.0",
+  "description": "Backend for Kerv Sales Demo",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
