@@ -1,0 +1,22 @@
+[
+  {
+    "name": "KERV Sales Rep",
+    "email": "sales@kerv.com",
+    "password": "Demo@123",
+    "organization": "Warner Bro.",
+    "access": [
+      "Search Tool"
+    ],
+    "emailVerified": true
+  },
+  {
+    "name": "Tejas",
+    "email": "tejas@gmail.com",
+    "password": "Test@1234",
+    "organization": "Warner Bro.",
+    "access": [
+      "Search Tool"
+    ],
+    "emailVerified": true
+  }
+]

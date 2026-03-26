@@ -1,47 +1,106 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { Box, Button, Container, TextField, Typography, Alert, Paper } from '@mui/material';
-import { loginSuccess, setError } from '../features/auth/authSlice';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
+import AuthShell from '../components/AuthShell';
+import { clearError, loginSuccess, setError } from '../features/auth/authSlice';
 import { loginUser } from '../features/auth/authService';
+import kervLogoIcon from '../assets/kerv-logo-icon.png';
 
 export default function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error } = useSelector((state) => state.auth);
+  const location = useLocation();
+  const { error, isAuthenticated } = useSelector((state) => state.auth);
   const [form, setForm] = useState({ email: '', password: '' });
+
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (location.state?.registeredEmail) {
+      setForm((current) => ({ ...current, email: location.state.registeredEmail }));
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    dispatch(clearError());
+
     try {
-      const user = loginUser(form.email, form.password);
+      const user = await loginUser(form.email, form.password);
       dispatch(loginSuccess(user));
-      navigate('/dashboard');
     } catch (err) {
       dispatch(setError(err.message));
     }
   };
 
   return (
-    <Container maxWidth="xs">
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <Paper elevation={3} sx={{ p: 4, width: '100%' }}>
-          <Typography variant="h5" fontWeight="bold" mb={2} textAlign="center">
-            Login
-          </Typography>
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-          <Box component="form" onSubmit={handleSubmit} display="flex" flexDirection="column" gap={2}>
-            <TextField label="Email" name="email" type="email" value={form.email} onChange={handleChange} required fullWidth />
-            <TextField label="Password" name="password" type="password" value={form.password} onChange={handleChange} required fullWidth />
-            <Button type="submit" variant="contained" fullWidth>Login</Button>
-            <Typography variant="body2" textAlign="center">
-              Don't have an account? <Link to="/register">Register</Link>
-            </Typography>
-          </Box>
-        </Paper>
-      </Box>
-    </Container>
+    <AuthShell
+      logoImage={{ src: kervLogoIcon, alt: 'KERV logo icon' }}
+      brandName="Sales Demo Tool"
+      separateBrandName
+      showHeroBranding={false}
+      solidBrandPanel
+      title={
+        <>
+          Welcome back!
+          <br />
+          Log in to your account.
+        </>
+      }
+      formTitle="Log in"
+      footer={
+        <Typography variant="body2">
+          Need access?{' '}
+          <Link to="/register" className="auth-link">
+            Register here
+          </Link>
+        </Typography>
+      }
+    >
+      <Stack component="form" spacing={2} onSubmit={handleSubmit} className="auth-form" noValidate>
+        {location.state?.registeredEmail ? (
+          <Alert severity="success">Registration complete. You can log in with your new KERV demo account.</Alert>
+        ) : null}
+        {error ? <Alert severity="error">{error}</Alert> : null}
+
+        <TextField
+          placeholder="Email"
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+          fullWidth
+        />
+        <TextField
+          placeholder="Password"
+          name="password"
+          type="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+          fullWidth
+        />
+
+        <Button type="submit" variant="contained" fullWidth>
+          LOG IN
+        </Button>
+
+        <Box className="auth-secondary-link">
+          <Typography component="span">FORGOT YOUR PASSWORD?</Typography>
+        </Box>
+      </Stack>
+    </AuthShell>
   );
 }
