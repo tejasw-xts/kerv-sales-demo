@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const MODEL_NAME = 'KervSalesDemoUser';
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -18,6 +20,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      default: 'user',
+      trim: true,
+    },
     organization: {
       type: String,
       default: 'Warner Bro.',
@@ -30,6 +37,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+    resetPasswordExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    emailVerificationToken: {
+      type: String,
+      default: null,
+    },
+    emailVerificationExpiresAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -37,4 +60,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = mongoose.models[MODEL_NAME] || mongoose.model(MODEL_NAME, userSchema);

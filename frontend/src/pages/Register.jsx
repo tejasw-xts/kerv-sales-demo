@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
-import { Alert, Button, Stack, TextField, Typography } from '@mui/material';
-import AuthShell from '../components/AuthShell';
+import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
 import { clearError, registerSuccess, setError } from '../features/auth/authSlice';
 import { registerUser } from '../features/auth/authService';
+import '../styles/auth.css';
+import kervLogo from '../assets/kerv-logo.svg';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -68,60 +69,80 @@ export default function Register() {
   };
 
   return (
-    <AuthShell
-      eyebrow="New Sales User"
-      title="Create your KERV access"
-      subtitle="Set up a demo account so you can store configurations, return to saved environments, and share secure walkthroughs with prospects."
-      formTitle="Register"
-      footer={
-        <Typography variant="body2">
-          Already have an account?{' '}
-          <Link to="/login" className="auth-link">
-            Log in instead
-          </Link>
-        </Typography>
-      }
-    >
-      <Stack component="form" spacing={2} onSubmit={handleSubmit} className="auth-form" noValidate>
-        {error ? <Alert severity="error">{error}</Alert> : null}
+    <Box className="prototype-login">
+      <Box className="prototype-login__frame">
+        <Box className="prototype-login__content">
+          <Stack direction="row" alignItems="center" spacing={1.5} className="prototype-login__brand-row">
+            <Box component="img" src={kervLogo} alt="Kerv logo" className="prototype-login__brand-logo" />
+            <Typography component="div" className="prototype-login__brand-text">
+              | Sales Demo Tool
+            </Typography>
+          </Stack>
 
-        <TextField
-          placeholder="Full Name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          error={Boolean(formErrors.name)}
-          helperText={formErrors.name || ' '}
-          required
-          fullWidth
-        />
-        <TextField
-          placeholder="Email"
-          name="email"
-          type="email"
-          value={form.email}
-          onChange={handleChange}
-          error={Boolean(formErrors.email)}
-          helperText={formErrors.email || ' '}
-          required
-          fullWidth
-        />
-        <TextField
-          placeholder="Password"
-          name="password"
-          type="password"
-          value={form.password}
-          onChange={handleChange}
-          error={Boolean(formErrors.password)}
-          helperText={formErrors.password || ' '}
-          required
-          fullWidth
-        />
+          <Typography component="h1" className="prototype-login__headline">
+            Welcome!
+            <br />
+            Create your account.
+          </Typography>
 
-        <Button type="submit" variant="contained" fullWidth>
-          CREATE ACCOUNT
-        </Button>
-      </Stack>
-    </AuthShell>
+          <Box className="prototype-login__form-wrap">
+            <Typography className="prototype-login__form-title">Register</Typography>
+
+            <Stack component="form" spacing={1.4} onSubmit={handleSubmit} className="prototype-login__form" noValidate>
+              {error ? <Alert severity="error">{error}</Alert> : null}
+
+              <TextField
+                placeholder="Full Name"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                error={Boolean(formErrors.name)}
+                helperText={formErrors.name || ' '}
+                required
+                fullWidth
+                size="small"
+              />
+              <TextField
+                placeholder="Email"
+                name="email"
+                type="email"
+                value={form.email}
+                onChange={handleChange}
+                error={Boolean(formErrors.email)}
+                helperText={formErrors.email || ' '}
+                required
+                fullWidth
+                size="small"
+              />
+              <TextField
+                placeholder="Password"
+                name="password"
+                type="password"
+                value={form.password}
+                onChange={handleChange}
+                error={Boolean(formErrors.password)}
+                helperText={formErrors.password || ' '}
+                required
+                fullWidth
+                size="small"
+              />
+
+              <Button type="submit" variant="contained" fullWidth className="prototype-login__submit">
+                CREATE ACCOUNT
+              </Button>
+
+              <Typography variant="body2" className="prototype-login__footer">
+                Already have an account?{' '}
+                <Link to="/login" className="auth-link">
+                  Log in instead
+                </Link>
+              </Typography>
+            </Stack>
+          </Box>
+        </Box>
+
+        <Box className="prototype-login__accent" aria-hidden="true" />
+      </Box>
+    </Box>
   );
 }

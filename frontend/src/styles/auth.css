@@ -213,6 +213,219 @@ a {
   text-decoration: underline;
 }
 
+.prototype-login {
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(125deg, #f6f6f6 5%, #e9ebf7 20%, #f6f6f6 42%, #ffe8f0 58%, #e9ebf7 77%, #f6f6f6 100%);
+}
+
+.prototype-login__frame {
+  width: min(100%, 1280px);
+  min-height: min(82vh, 760px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  background: #ffffff;
+}
+
+.prototype-login__content {
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.prototype-login__brand-row {
+  margin-bottom: 36px;
+  flex-wrap: nowrap;
+}
+
+.prototype-login__brand-logo {
+  width: 40px;
+  height: 40px;
+  display: block;
+}
+
+.prototype-login__brand-text.MuiTypography-root {
+  font-size: 31px;
+  line-height: 32px;
+  margin: 0;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+  opacity: 0.87;
+  white-space: nowrap;
+}
+
+.prototype-login__headline.MuiTypography-root {
+  margin: 0 0 48px;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 48px;
+  line-height: 1.25;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.87);
+  letter-spacing: 0;
+}
+
+.prototype-login__form-wrap {
+  width: min(100%, 420px);
+}
+
+.prototype-login__form-title.MuiTypography-root {
+  margin-bottom: 20px;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 36px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.87);
+  letter-spacing: 0;
+}
+
+.prototype-login__form .MuiInputBase-root {
+  min-height: 40px;
+  font-family: inherit;
+}
+
+.prototype-login__form .MuiOutlinedInput-input {
+  padding: 10.5px 14px;
+  font-family: inherit;
+  font-size: 16px;
+}
+
+.prototype-login__submit.MuiButton-root {
+  margin-top: 9.6px;
+  min-height: 42px;
+  background: #ed005e;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.02857em;
+  box-shadow: none;
+}
+
+.prototype-login__submit.MuiButton-root:hover {
+  background: #cf0052;
+  box-shadow: none;
+}
+
+.prototype-login__forgot.MuiButton-root {
+  margin-top: 1.6px;
+  padding: 11px 0px;
+  width: fit-content;
+  justify-content: flex-start;
+  color: #a0245d;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.prototype-login__signup-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: -2px;
+  flex-wrap: nowrap;
+}
+
+.prototype-login__register-link.MuiButton-root {
+  margin-top: 1px;
+  padding: 0;
+  width: fit-content;
+  justify-content: flex-start;
+  color: #ed005e;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.prototype-login__signup-message.MuiTypography-root {
+  margin: 0;
+  color: #6d7488;
+  font-size: 14px;
+}
+
+.prototype-login__footer {
+  margin-top: 24px;
+  color: var(--auth-ink-soft);
+}
+
+.prototype-login__accent {
+  background: #ed005e;
+}
+
+.prototype-login__forgot-dialog {
+  border-radius: 16px;
+}
+
+.prototype-login__forgot-dialog-content {
+  padding: 43px;
+  background-color: #ffffff;
+}
+
+.prototype-login__forgot-dialog-title.MuiTypography-root {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.prototype-login__forgot-dialog-text.MuiTypography-root {
+  margin-bottom: 20px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #6d7488;
+}
+
+.prototype-login__forgot-dialog-actions {
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .prototype-login {
+    padding: 12px;
+  }
+
+  .prototype-login__frame {
+    min-height: auto;
+    grid-template-columns: 1fr;
+  }
+
+  .prototype-login__content {
+    order: 2;
+    padding: 40px 24px;
+  }
+
+  .prototype-login__accent {
+    min-height: 140px;
+    order: 1;
+  }
+
+  .prototype-login__brand-text {
+    font-size: 24px;
+  }
+
+  .prototype-login__headline {
+    font-size: 40px;
+    margin-bottom: 36px;
+  }
+
+  .prototype-login__form-title {
+    font-size: 30px;
+  }
+}
+
 .kerv-mark {
   width: min(100%, 330px);
   aspect-ratio: 1;

@@ -11,6 +11,7 @@ const defaultUsers = [
     name: 'KERV Sales Rep',
     email: 'sales@kerv.com',
     password: 'Demo@123',
+    role: 'user',
     organization: 'Warner Bro.',
     access: ['Search Tool'],
     emailVerified: true,
@@ -18,7 +19,18 @@ const defaultUsers = [
 ];
 
 function sanitizeUser(user) {
-  const { password, ...safeUser } = user;
+  if (!user) {
+    return null;
+  }
+
+  const {
+    password,
+    resetPasswordToken,
+    resetPasswordExpiresAt,
+    emailVerificationToken,
+    emailVerificationExpiresAt,
+    ...safeUser
+  } = user;
   return safeUser;
 }
 
@@ -63,9 +75,10 @@ async function createUser(userData) {
     name: userData.name.trim(),
     email: userData.email.trim().toLowerCase(),
     password: userData.password,
+    role: userData.role || 'user',
     organization: userData.organization || 'Warner Bro.',
     access: userData.access || ['Search Tool'],
-    emailVerified: userData.emailVerified ?? true,
+    emailVerified: userData.emailVerified ?? false,
   };
 
   if (useMongo()) {
@@ -82,20 +95,22 @@ async function createUser(userData) {
 async function updateUserProfile(currentEmail, updates) {
   const normalizedCurrentEmail = currentEmail.trim().toLowerCase();
   const nextEmail = updates.email.trim().toLowerCase();
+  const nextName = updates.name.trim();
 
   if (useMongo()) {
     const updatedUser = await User.findOneAndUpdate(
       { email: normalizedCurrentEmail },
       {
         $set: {
-          name: updates.name.trim(),
+          name: nextName,
           email: nextEmail,
+          role: updates.role || 'user',
           organization: updates.organization || 'Warner Bro.',
           access: updates.access || ['Search Tool'],
           emailVerified: updates.emailVerified,
         },
       },
-      { new: true }
+      { returnDocument: 'after' }
     ).lean();
 
     return updatedUser ? sanitizeUser(updatedUser) : null;
@@ -110,8 +125,9 @@ async function updateUserProfile(currentEmail, updates) {
 
   users[userIndex] = {
     ...users[userIndex],
-    name: updates.name.trim(),
+    name: nextName,
     email: nextEmail,
+    role: updates.role || users[userIndex].role || 'user',
     organization: updates.organization || users[userIndex].organization || 'Warner Bro.',
     access: updates.access || users[userIndex].access || ['Search Tool'],
     emailVerified: updates.emailVerified,
@@ -131,9 +147,175 @@ async function verifyPassword(email, password) {
   return sanitizeUser(user);
 }
 
+async function saveResetPasswordToken(email, token, expiresAt) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (useMongo()) {
+    const updatedUser = await User.findOneAndUpdate(
+      { email: normalizedEmail },
+      {
+        $set: {
+          resetPasswordToken: token,
+          resetPasswordExpiresAt: expiresAt,
+        },
+      },
+      { returnDocument: 'after' }
+    ).lean();
+
+    return updatedUser ? sanitizeUser(updatedUser) : null;
+  }
+
+  const users = await readUsers();
+  const userIndex = users.findIndex((user) => user.email.toLowerCase() === normalizedEmail);
+
+  if (userIndex === -1) {
+    return null;
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    resetPasswordToken: token,
+    resetPasswordExpiresAt: expiresAt,
+  };
+
+  await writeUsers(users);
+  return sanitizeUser(users[userIndex]);
+}
+
+async function resetPasswordWithToken(token, password) {
+  const now = new Date();
+
+  if (useMongo()) {
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        resetPasswordToken: token,
+        resetPasswordExpiresAt: { $gt: now },
+      },
+      {
+        $set: {
+          password,
+          resetPasswordToken: null,
+          resetPasswordExpiresAt: null,
+        },
+      },
+      { returnDocument: 'after' }
+    ).lean();
+
+    return updatedUser ? sanitizeUser(updatedUser) : null;
+  }
+
+  const users = await readUsers();
+  const userIndex = users.findIndex((user) => {
+    if (user.resetPasswordToken !== token || !user.resetPasswordExpiresAt) {
+      return false;
+    }
+
+    return new Date(user.resetPasswordExpiresAt) > now;
+  });
+
+  if (userIndex === -1) {
+    return null;
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    password,
+    resetPasswordToken: null,
+    resetPasswordExpiresAt: null,
+  };
+
+  await writeUsers(users);
+  return sanitizeUser(users[userIndex]);
+}
+
+async function saveEmailVerificationToken(email, token, expiresAt) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (useMongo()) {
+    const updatedUser = await User.findOneAndUpdate(
+      { email: normalizedEmail },
+      {
+        $set: {
+          emailVerificationToken: token,
+          emailVerificationExpiresAt: expiresAt,
+        },
+      },
+      { returnDocument: 'after' }
+    ).lean();
+
+    return updatedUser ? sanitizeUser(updatedUser) : null;
+  }
+
+  const users = await readUsers();
+  const userIndex = users.findIndex((user) => user.email.toLowerCase() === normalizedEmail);
+
+  if (userIndex === -1) {
+    return null;
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    emailVerificationToken: token,
+    emailVerificationExpiresAt: expiresAt,
+  };
+
+  await writeUsers(users);
+  return sanitizeUser(users[userIndex]);
+}
+
+async function verifyEmailWithToken(token) {
+  const now = new Date();
+
+  if (useMongo()) {
+    const updatedUser = await User.findOneAndUpdate(
+      {
+        emailVerificationToken: token,
+        emailVerificationExpiresAt: { $gt: now },
+      },
+      {
+        $set: {
+          emailVerified: true,
+          emailVerificationToken: null,
+          emailVerificationExpiresAt: null,
+        },
+      },
+      { returnDocument: 'after' }
+    ).lean();
+
+    return updatedUser ? sanitizeUser(updatedUser) : null;
+  }
+
+  const users = await readUsers();
+  const userIndex = users.findIndex((user) => {
+    if (user.emailVerificationToken !== token || !user.emailVerificationExpiresAt) {
+      return false;
+    }
+
+    return new Date(user.emailVerificationExpiresAt) > now;
+  });
+
+  if (userIndex === -1) {
+    return null;
+  }
+
+  users[userIndex] = {
+    ...users[userIndex],
+    emailVerified: true,
+    emailVerificationToken: null,
+    emailVerificationExpiresAt: null,
+  };
+
+  await writeUsers(users);
+  return sanitizeUser(users[userIndex]);
+}
+
 module.exports = {
   createUser,
   findUserByEmail,
+  resetPasswordWithToken,
+  saveEmailVerificationToken,
+  saveResetPasswordToken,
   updateUserProfile,
+  verifyEmailWithToken,
   verifyPassword,
 };
